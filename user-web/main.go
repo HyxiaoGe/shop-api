@@ -3,17 +3,18 @@ package main
 import (
 	"fmt"
 	"go.uber.org/zap"
+	"shop-api/user-web/global"
 	"shop-api/user-web/initialize"
 )
 
 func main() {
-	port := 8021
 	initialize.InitLogger()
+	initialize.InitConfig()
 	Router := initialize.Routers()
 
-	zap.S().Debugf("启动web服务，端口为:%d", port)
+	zap.S().Debugf("启动web服务，端口为:%d", global.ServerConfig.Port)
 
-	err := Router.Run(fmt.Sprintf(":%d", port))
+	err := Router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port))
 	if err != nil {
 		zap.S().Panic("启动失败:", err.Error())
 	}
