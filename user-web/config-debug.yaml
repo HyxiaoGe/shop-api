@@ -3,3 +3,5 @@ port: 8021
 user:
   host: '127.0.0.1'
   port: 50051
+jwt:
+  signing-key: '+paCX)hWTyf=MfgbF-C]xhUEfm0X3j:b'
