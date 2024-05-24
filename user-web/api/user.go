@@ -121,4 +121,50 @@ func LoginByPassword(ctx *gin.Context) {
 		HandlerValidatorError(ctx, err)
 		return
 	}
+
+	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", global.ServerConfig.UserConfig.Host, global.ServerConfig.UserConfig.Port), grpc.WithInsecure())
+	if err != nil {
+		zap.S().Errorf("连接用户服务失败: %v", err)
+		return
+	}
+	//defer userConn.Close()
+	userClient := proto.NewUserClient(userConn)
+	if rsp, err := userClient.GetUserByMobile(context.Background(), &proto.MobileRequest{
+		Mobile: loginForm.Mobile,
+	}); err != nil {
+		if e, ok := status.FromError(err); ok {
+			switch e.Code() {
+			case codes.NotFound:
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"msg": "用户不存在",
+				})
+			default:
+				ctx.JSON(http.StatusInternalServerError, gin.H{
+					"msg": "登录失败，请联系管理员",
+				})
+			}
+			return
+		}
+	} else {
+		if pwdRsp, pwdErr := userClient.CheckPassword(context.Background(), &proto.PasswordCheckInfo{
+			Password:          loginForm.Password,
+			EncryptedPassword: rsp.Password,
+		}); pwdErr != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"msg": "登录失败",
+			})
+		} else {
+			if pwdRsp.Result {
+				ctx.JSON(http.StatusOK, gin.H{
+					"msg": "登录成功",
+				})
+			} else {
+				ctx.JSON(http.StatusBadRequest, gin.H{
+					"msg": "密码错误，请重新输入",
+				})
+			}
+
+		}
+	}
+
 }

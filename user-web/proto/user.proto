@@ -8,7 +8,16 @@ service User {
   rpc GetUserByMobile(MobileRequest) returns (UserInfoResponse) {}
   rpc CreateUser(CreateUserInfo) returns (UserInfoResponse) {}
   rpc UpdateUser(UpdateUserInfo) returns (google.protobuf.Empty) {}
+  rpc CheckPassword(PasswordCheckInfo) returns (CheckResponse) {}
+}
 
+message PasswordCheckInfo {
+  string password = 1;
+  string encryptedPassword = 2;
+}
+
+message CheckResponse {
+  bool result = 1;
 }
 
 message PageInfo {
@@ -43,11 +52,11 @@ message UserListResponse {
 }
 
 message UserInfoResponse {
-    int64 id = 1;
-    string password = 2;
-    string mobile = 3;
-    string nickname = 4;
-    uint64 birthday = 5;
-    string gender = 6;
-    int32 role = 7;
+  int64 id = 1;
+  string password = 2;
+  string mobile = 3;
+  string nickname = 4;
+  uint64 birthday = 5;
+  string gender = 6;
+  int32 role = 7;
 }
