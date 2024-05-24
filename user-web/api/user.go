@@ -4,16 +4,28 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"net/http"
+	"shop-api/user-web/forms"
 	"shop-api/user-web/global"
 	"shop-api/user-web/global/response"
 	"shop-api/user-web/proto"
+	"strconv"
+	"strings"
 	"time"
 )
+
+func removeTopStruct(fields map[string]string) map[string]string {
+	rsp := map[string]string{}
+	for field, err := range fields {
+		rsp[field[strings.Index(field, ".")+1:]] = err
+	}
+	return rsp
+}
 
 func HandlerGrpcErrorToHttp(err error, c *gin.Context) {
 	if err != nil {
@@ -45,6 +57,19 @@ func HandlerGrpcErrorToHttp(err error, c *gin.Context) {
 	}
 }
 
+func HandlerValidatorError(ctx *gin.Context, err error) {
+	errs, ok := err.(validator.ValidationErrors)
+	if !ok {
+		ctx.JSON(http.StatusOK, gin.H{
+			"msg": err.Error(),
+		})
+	}
+	ctx.JSON(http.StatusBadRequest, gin.H{
+		"error": removeTopStruct(errs.Translate(global.Trans)),
+	})
+	return
+}
+
 func GetUserList(ctx *gin.Context) {
 	userConn, err := grpc.Dial(fmt.Sprintf("%s:%d", global.ServerConfig.UserConfig.Host, global.ServerConfig.UserConfig.Port), grpc.WithInsecure())
 	if err != nil {
@@ -53,9 +78,13 @@ func GetUserList(ctx *gin.Context) {
 	}
 	//defer userConn.Close()
 	userClient := proto.NewUserClient(userConn)
+	Page := ctx.DefaultQuery("page", "1")
+	PageInt, _ := strconv.Atoi(Page)
+	PageSize := ctx.DefaultQuery("pageSize", "10")
+	PageSizeInt, _ := strconv.Atoi(PageSize)
 	rsp, err := userClient.GetUserList(context.Background(), &proto.PageInfo{
-		Page:     1,
-		PageSize: 10,
+		Page:     int32(PageInt),
+		PageSize: int32(PageSizeInt),
 	})
 	if err != nil {
 		zap.S().Errorw("获取用户列表失败", "msg", err.Error())
@@ -84,4 +113,12 @@ func GetUserList(ctx *gin.Context) {
 		result = append(result, user)
 	}
 	ctx.JSON(http.StatusOK, result)
+}
+
+func LoginByPassword(ctx *gin.Context) {
+	loginForm := forms.LoginForm{}
+	if err := ctx.ShouldBind(&loginForm); err != nil {
+		HandlerValidatorError(ctx, err)
+		return
+	}
 }

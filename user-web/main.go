@@ -11,6 +11,9 @@ func main() {
 	initialize.InitLogger()
 	initialize.InitConfig()
 	Router := initialize.Routers()
+	if err := initialize.InitTrans("zh"); err != nil {
+		panic(err)
+	}
 
 	zap.S().Debugf("启动web服务，端口为:%d", global.ServerConfig.Port)
 
