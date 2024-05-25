@@ -79,6 +79,8 @@ func GetUserList(ctx *gin.Context) {
 		zap.S().Errorf("连接用户服务失败: %v", err)
 		return
 	}
+	claims, _ := ctx.Get("claims")
+	zap.S().Infof("访问用户：%d", claims.(*models.CustomClaims).ID)
 	//defer userConn.Close()
 	userClient := proto.NewUserClient(userConn)
 	Page := ctx.DefaultQuery("page", "1")
