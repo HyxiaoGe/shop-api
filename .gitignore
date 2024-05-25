@@ -1,3 +1,7 @@
 /.idea/.gitignore
 /.idea/modules.xml
 /.idea/shop-api.iml
+
+config-debug.yaml
+config-pro.yaml
+
