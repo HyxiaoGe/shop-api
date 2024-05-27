@@ -12,12 +12,19 @@ import (
 )
 
 func main() {
+	//	初始化logger
 	initialize.InitLogger()
+	//	初始化配置文件
 	initialize.InitConfig()
+	//	初始化routers
 	Router := initialize.Routers()
+	//	初始化翻译
 	if err := initialize.InitTrans("zh"); err != nil {
 		panic(err)
 	}
+
+	// 初始化连接
+	initialize.InitClient()
 
 	//	注册验证器
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
