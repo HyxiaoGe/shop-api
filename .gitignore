@@ -5,3 +5,5 @@
 config-debug.yaml
 config-pro.yaml
 
+/tmp/
+/tmp/nacos/cache/

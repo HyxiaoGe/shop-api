@@ -35,3 +35,13 @@ type ServerConfig struct {
 	Redis      RedisConfig  `mapstructure:"redis" json:"redis"`
 	ConsulInfo ConsulConfig `mapstructure:"consul" json:"consul"`
 }
+
+type NacosConfig struct {
+	Host        string `mapstructure:"host" json:"host"`
+	Port        uint64 `mapstructure:"port" json:"port"`
+	NamespaceId string `mapstructure:"namespace-id" json:"namespace-id"`
+	Group       string `mapstructure:"group" json:"group"`
+	DataId      string `mapstructure:"data-id" json:"data-id"`
+	Username    string `mapstructure:"username" json:"username"`
+	Password    string `mapstructure:"password" json:"password"`
+}

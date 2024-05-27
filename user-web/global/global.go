@@ -9,6 +9,6 @@ import (
 var (
 	Trans        ut.Translator
 	ServerConfig *config.ServerConfig = &config.ServerConfig{}
-
-	UserClient proto.UserClient
+	NacosConfig  *config.NacosConfig  = &config.NacosConfig{}
+	UserClient   proto.UserClient
 )
