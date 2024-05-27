@@ -3,6 +3,7 @@ package initialize
 import (
 	"fmt"
 	"github.com/hashicorp/consul/api"
+	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"shop-api/user-web/global"
@@ -10,6 +11,20 @@ import (
 )
 
 func InitClient() {
+	consulInfo := global.ServerConfig.ConsulInfo
+	userConn, err := grpc.Dial(
+		fmt.Sprintf("consul://%s:%d/%s?wait=14s", consulInfo.Host, consulInfo.Port, global.ServerConfig.UserConfig.Name),
+		grpc.WithInsecure(),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+	)
+	if err != nil {
+		zap.S().Fatal("用户服务不可用")
+		return
+	}
+	global.UserClient = proto.NewUserClient(userConn)
+}
+
+func InitClient_Deprecated() {
 	// 从注册中心获取到用户服务的信息
 	cfg := api.DefaultConfig()
 	consulInfo := global.ServerConfig.ConsulInfo
