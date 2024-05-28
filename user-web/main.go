@@ -7,10 +7,14 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
+	_ "os"
+	_ "os/signal"
+	_ "shop-api/goods-web/utils/register/consul"
 	"shop-api/user-web/global"
 	"shop-api/user-web/initialize"
 	"shop-api/user-web/utils"
 	customValidator "shop-api/user-web/validator"
+	_ "syscall"
 )
 
 func main() {
@@ -50,8 +54,24 @@ func main() {
 
 	zap.S().Debugf("启动web服务，端口为:%d", global.ServerConfig.Port)
 
+	//register_client := consul.NewRegisterClient(global.ServerConfig.ConsulInfo.Host, global.ServerConfig.ConsulInfo.Port)
+	//e := register_client.Register("127.0.0.1", 8021, global.ServerConfig.Name, []string{global.ServerConfig.Tags}, "goods_test_id")
+	//if e != nil {
+	//	zap.S().Panic("注册服务失败:", e.Error())
+	//}
+
 	err := Router.Run(fmt.Sprintf(":%d", global.ServerConfig.Port))
 	if err != nil {
 		zap.S().Panic("启动失败:", err.Error())
 	}
+
+	//	接收终止信号
+	//quit := make(chan os.Signal)
+	//signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	//<-quit
+	//if e = register_client.DeRegister("test_id"); e != nil {
+	//	zap.S().Info("注销服务失败:", e.Error())
+	//} else {
+	//	zap.S().Info("注销服务成功")
+	//}
 }

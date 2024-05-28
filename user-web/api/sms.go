@@ -30,7 +30,7 @@ func GenerateSMSCode(width int) string {
 func SendSMS(ctx *gin.Context) {
 	sendSMS := forms.SendSMSForm{}
 	if err := ctx.ShouldBind(&sendSMS); err != nil {
-		HandlerValidatorError(ctx, err)
+		HandleValidatorError(ctx, err)
 		return
 
 	}

@@ -17,6 +17,8 @@ type ConsulConfig struct {
 
 type ServerConfig struct {
 	Name        string       `mapstructure:"name" json:"name"`
+	Host        string       `mapstructure:"host" json:"host"`
+	Tags        string       `mapstructure:"tags" json:"tags"`
 	JWTInfo     JWTInfo      `mapstructure:"jwt" json:"jwt"`
 	Port        int          `mapstructure:"port" json:"port"`
 	GoodsConfig GoodsConfig  `mapstructure:"goods" json:"goods"`
