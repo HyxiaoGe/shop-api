@@ -30,7 +30,7 @@ func removeTopStruct(fields map[string]string) map[string]string {
 	return rsp
 }
 
-func HandlerGrpcErrorToHttp(err error, c *gin.Context) {
+func HandleGrpcErrorToHttp(err error, c *gin.Context) {
 	if err != nil {
 		if e, ok := status.FromError(err); ok {
 			switch e.Code() {
@@ -60,7 +60,7 @@ func HandlerGrpcErrorToHttp(err error, c *gin.Context) {
 	}
 }
 
-func HandlerValidatorError(ctx *gin.Context, err error) {
+func HandleValidatorError(ctx *gin.Context, err error) {
 	errs, ok := err.(validator.ValidationErrors)
 	if !ok {
 		ctx.JSON(http.StatusOK, gin.H{
@@ -87,7 +87,7 @@ func GetUserList(ctx *gin.Context) {
 	})
 	if err != nil {
 		zap.S().Errorw("获取用户列表失败", "msg", err.Error())
-		HandlerGrpcErrorToHttp(err, ctx)
+		HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 
@@ -117,7 +117,7 @@ func GetUserList(ctx *gin.Context) {
 func LoginByPassword(ctx *gin.Context) {
 	loginForm := forms.LoginForm{}
 	if err := ctx.ShouldBind(&loginForm); err != nil {
-		HandlerValidatorError(ctx, err)
+		HandleValidatorError(ctx, err)
 		return
 	}
 	// 暂时取消验证码验证
@@ -192,7 +192,7 @@ func LoginByPassword(ctx *gin.Context) {
 func Register(ctx *gin.Context) {
 	registerForm := forms.RegisterForm{}
 	if err := ctx.ShouldBind(&registerForm); err != nil {
-		HandlerValidatorError(ctx, err)
+		HandleValidatorError(ctx, err)
 		return
 	}
 	rdb := redis.NewClient(&redis.Options{
@@ -225,7 +225,7 @@ func Register(ctx *gin.Context) {
 
 	if err != nil {
 		zap.S().Errorw("新建用户失败", "msg", err.Error())
-		HandlerGrpcErrorToHttp(err, ctx)
+		HandleGrpcErrorToHttp(err, ctx)
 		return
 	}
 

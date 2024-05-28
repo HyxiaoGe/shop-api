@@ -3,8 +3,8 @@ package initialize
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"shop-api/user-web/middlewares"
-	"shop-api/user-web/router"
+	"shop-api/goods-web/middlewares"
+	"shop-api/goods-web/router"
 )
 
 func Routers() *gin.Engine {
@@ -17,8 +17,7 @@ func Routers() *gin.Engine {
 		})
 	})
 	Router.Use(middlewares.Cors())
-	ApiGroup := Router.Group("/user/v1")
-	router.InitUserRouter(ApiGroup)
-	router.InitBaseRouter(ApiGroup)
+	ApiGroup := Router.Group("/goods/v1")
+	router.InitGoodsRouter(ApiGroup)
 	return Router
 }
